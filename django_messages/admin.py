@@ -69,6 +69,11 @@ class MessageAdmin(admin.ModelAdmin):
         When changing an existing message and choosing optional recipients,
         the message is effectively resent to those users.
         """
+        try:
+            obj.owner
+        except User.DoesNotExist:
+            obj.owner = request.user
+
         obj.save()
         
         if notification:
