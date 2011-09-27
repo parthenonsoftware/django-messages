@@ -118,10 +118,16 @@ class Message(models.Model):
         return bool(self.replied_at is not None)
 
     def __save__(self, *args, **kwargs):
+        # No owner specified; use sender
         try:
             self.owner
         except User.DoesNotExist:
             self.owner = self.sender
+        
+        # No sent_at specified; use now
+        if not self.sent_at:
+            self.sent_at = datetime.datetime.now()
+
         super(Message, self).__save__(self, *args, **kwargs)
     
     def __unicode__(self):
