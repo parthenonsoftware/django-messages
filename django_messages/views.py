@@ -1,24 +1,14 @@
 # -*- coding:utf-8 -*-
-import datetime
-
-from django.http import Http404, HttpResponseRedirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.utils.translation import ugettext as _
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_noop
-from django.core.urlresolvers import reverse
-from django.conf import settings
+from django.views.generic.list_detail import object_list
 
-from django.db import transaction
-
-from django.views.generic.list_detail import object_list, object_detail
-
-from django_messages.models import Message
 from django_messages.forms import ComposeForm, ReplyForm
-from django_messages.utils import format_quote
+from django_messages.models import Message
 
 
 @login_required

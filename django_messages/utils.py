@@ -1,13 +1,9 @@
 # -*- coding:utf-8 -*-
-import re
-
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.utils.encoding import force_unicode
+from django.template.loader import render_to_string
 from django.utils.text import wrap
 from django.utils.translation import ugettext_lazy as _
-from django.template import Context, loader
-from django.template.loader import render_to_string
 
 # favour django-mailer but fall back to django.core.mail
 

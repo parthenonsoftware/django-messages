@@ -1,7 +1,8 @@
 import datetime
-from django.test import TestCase
+
 from django.contrib.auth.models import User
 from django_messages.models import Message
+from django.test import TestCase
 
 class SendTestCase(TestCase):
     def setUp(self):

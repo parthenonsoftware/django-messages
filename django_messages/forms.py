@@ -1,10 +1,9 @@
 import datetime
+import uuid
+
 from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext_noop
-from django.contrib.auth.models import User
-import uuid
 
 if "notification" in settings.INSTALLED_APPS:
     from notification import models as notification
