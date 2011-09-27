@@ -116,6 +116,13 @@ class Message(models.Model):
     def replied(self):
         """returns whether the recipient has written a reply to this message"""
         return bool(self.replied_at is not None)
+
+    def __save__(self, *args, **kwargs):
+        try:
+            self.owner
+        except User.DoesNotExist:
+            self.owner = self.sender
+        super(Message, self).__save__(self, *args, **kwargs)
     
     def __unicode__(self):
         return self.subject
