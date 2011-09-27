@@ -117,7 +117,7 @@ class Message(models.Model):
         """returns whether the recipient has written a reply to this message"""
         return bool(self.replied_at is not None)
 
-    def __save__(self, *args, **kwargs):
+    def save(self, *args, **kwargs):
         # No owner specified; use sender
         try:
             self.owner
@@ -128,7 +128,7 @@ class Message(models.Model):
         if not self.sent_at:
             self.sent_at = datetime.datetime.now()
 
-        super(Message, self).__save__(self, *args, **kwargs)
+        super(Message, self).save(self, *args, **kwargs)
     
     def __unicode__(self):
         return self.subject
