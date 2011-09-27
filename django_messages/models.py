@@ -128,7 +128,7 @@ class Message(models.Model):
         if not self.sent_at:
             self.sent_at = datetime.datetime.now()
 
-        super(Message, self).save(self, *args, **kwargs)
+        super(Message, self).save(*args, **kwargs)
     
     def __unicode__(self):
         return self.subject
