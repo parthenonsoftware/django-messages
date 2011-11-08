@@ -12,6 +12,13 @@
         <dt>{% trans "Recipient" %}</dt>
         <dd>{{ message.recipient }}</dd>
     </dl>
+    {% load thumbnail %}
+    {% if message.sender.get_profile.primary_photo %}
+        {% thumbnail message.sender.get_profile.primary_photo.photo '400x300' crop='center' as primary %}
+          <img src="{{ primary.url }}" alt="Main Photo" />
+        {% endthumbnail %}
+    {% endif %}
+
     {{ message.body|linebreaksbr }}<br /><br />
 
     {% ifequal message.recipient.pk user.pk %}
