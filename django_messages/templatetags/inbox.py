@@ -1,5 +1,16 @@
-from django.template import Library, Node, TemplateSyntaxError
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from django.template import Library, Node, TemplateSyntaxError, Variable
+from django.template.defaultfilters import truncatewords_html, linebreaksbr
 from django_messages.models import inbox_count_for
+
+register = Library()     
+
+FREE_MEMBER_TRUNCATE_MESSAGE_WORDS = getattr(
+        settings, 
+        'FREE_MEMBER_TRUNCATE_MESSAGE_WORDS',
+        100
+    )
 
 class InboxOutput(Node):
     def __init__(self, varname=None):
@@ -17,6 +28,7 @@ class InboxOutput(Node):
         else:
             return "%s" % (count)        
         
+@register.tag(name = 'inbox_count')
 def do_print_inbox_count(parser, token):
     """
     A templatetag to show the unread-count for a logged in user.
@@ -42,5 +54,32 @@ def do_print_inbox_count(parser, token):
     else:
         return InboxOutput()
 
-register = Library()     
-register.tag('inbox_count', do_print_inbox_count)
+class MessageNode(Node):
+    def __init__(self, message):
+        self.message = Variable(message)
+
+    def render(self, context):
+        message = self.message.resolve(context)
+        try:
+            plan = context["user"].get_profile().subscription
+            if not plan or plan.membership_plan.free:
+                message = truncatewords_html(message.body, FREE_MEMBER_TRUNCATE_MESSAGE_WORDS)
+        except (AttributeError, ObjectDoesNotExist):
+            pass
+        return linebreaksbr(message)
+
+@register.tag(name = 'render_message')
+def do_render_message(parser, token):
+    """
+    Renders a message to the template; please do not do this rendering manually
+    as there are special business rules to follow.
+
+    Usage::
+        {% load inbox %}
+        {% render_message MESSAGE %}
+
+    """
+    bits = token.contents.split()
+    if len(bits) != 2:
+        raise TemplateSyntaxError("{% render_message %} requires a single argument, the message object to render.");
+    return MessageNode(bits[1])

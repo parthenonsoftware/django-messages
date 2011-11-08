@@ -1,25 +1,26 @@
 {% extends "django_messages/base.html" %} 
-{% load i18n %} 
+{% load i18n thumbnail inbox %} 
 {% block messages_content %}
     <h1>{% trans "View Message" %}</h1>
     <dl class="message-headers">
         <dt>{% trans "Subject" %}</dt>
         <dd><strong>{{ message.subject }}</strong></dd>
         <dt>{% trans "Sender" %}</dt>
-        <dd>{{ message.sender }}</dd>
+        <dd>
+            {% if message.sender.get_profile.primary_photo %}
+                {% thumbnail message.sender.get_profile.primary_photo.photo '400x300' crop='center' as primary %}
+                  <img src="{{ primary.url }}" alt="Main Photo" />
+                {% endthumbnail %}
+            {% endif %}
+            {{ message.sender }}
+        </dd>
         <dt>{% trans "Date" %} </dt>
         <dd>{{ message.sent_at|date:_("DATETIME_FORMAT")}}</dd>
         <dt>{% trans "Recipient" %}</dt>
         <dd>{{ message.recipient }}</dd>
     </dl>
-    {% load thumbnail %}
-    {% if message.sender.get_profile.primary_photo %}
-        {% thumbnail message.sender.get_profile.primary_photo.photo '400x300' crop='center' as primary %}
-          <img src="{{ primary.url }}" alt="Main Photo" />
-        {% endthumbnail %}
-    {% endif %}
 
-    {{ message.body|linebreaksbr }}<br /><br />
+    {% render_message message %}
 
     {% ifequal message.recipient.pk user.pk %}
     <a href="{% url messages_reply message.id %}">{% trans "Reply" %}</a>
