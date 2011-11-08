@@ -129,6 +129,20 @@ class Message(models.Model):
         if not self.sent_at:
             self.sent_at = datetime.datetime.now()
 
+        try:
+            if self.owner == self.sender:
+                from parthenon_chat.utils import publish_public_notification
+                publish_public_notification(
+                            self.recipient,
+                            "{username} just sent you a message '{subject}'.".format(
+                                    username = self.owner.username,
+                                    subject = self.subject,
+                                ),
+                            "notification"
+                        )
+        except ImportError:
+            pass
+
         super(Message, self).save(*args, **kwargs)
     
     def __unicode__(self):
