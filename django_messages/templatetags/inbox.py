@@ -60,13 +60,14 @@ class MessageNode(Node):
 
     def render(self, context):
         message = self.message.resolve(context)
+        message_str = message.body
         try:
             plan = context["user"].get_profile().subscription
             if not plan or plan.membership_plan.free:
-                message = truncatewords_html(message.body, FREE_MEMBER_TRUNCATE_MESSAGE_WORDS)
+                message_str = truncatewords_html(message_str, FREE_MEMBER_TRUNCATE_MESSAGE_WORDS)
         except (AttributeError, ObjectDoesNotExist):
             pass
-        return linebreaksbr(message)
+        return linebreaksbr(message_str)
 
 @register.tag(name = 'render_message')
 def do_render_message(parser, token):
