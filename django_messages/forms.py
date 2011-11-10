@@ -14,6 +14,7 @@ from django_messages.models import Message
 from django_messages.fields import CommaSeparatedUserField
 from django_messages.utils import format_quote
 
+from mstranslator.models import Language
 
 class MessageForm(forms.ModelForm):
     """
@@ -23,10 +24,13 @@ class MessageForm(forms.ModelForm):
     subject = forms.CharField(label=_(u"Subject"))
     body = forms.CharField(label=_(u"Body"),
         widget=forms.Textarea(attrs={'rows': '12', 'cols':'55'}))
+    language = forms.ModelChoiceField(
+                queryset = Language.objects.all()
+            )
 
     class Meta:
         model = Message
-        fields = ('recipients', 'subject', 'body',)
+        fields = ('recipients', 'subject', 'body', 'language', )
 
     def __init__(self, sender, *args, **kw):
         recipient_filter = kw.pop('recipient_filter', None)
@@ -45,6 +49,9 @@ class MessageForm(forms.ModelForm):
             body = message.body,
             thread = message.thread,
             sent_at = message.sent_at,
+            language = message.language,
+            language_translated = message.language_translated,
+            body_translated = message.body_translated,
         )
 
     def get_thread(self, message):
@@ -59,6 +66,15 @@ class MessageForm(forms.ModelForm):
         instance.thread = self.get_thread(instance)
         instance.unread = False
         instance.sent_at = datetime.datetime.now()
+
+        if (
+                instance.language != None
+                and instance.body_translated == None
+                and hasattr(instance.recipient.get_profile(), 'preferred_language') 
+                and instance.recipient.get_profile().preferred_language 
+            ):
+            instance.language_translated = instance.recipient.get_profile().preferred_language
+            instance.body_translated = instance.language.translate_message_to(instance.body, instance.language_translated)
 
         message_list = []
 
@@ -89,7 +105,7 @@ class ComposeForm(MessageForm):
 
     class Meta:
         model = Message
-        fields = ('recipients', 'subject', 'body',)
+        fields = ('recipients', 'subject', 'body', 'language', )
     
 
 class ReplyForm(MessageForm):
@@ -98,7 +114,7 @@ class ReplyForm(MessageForm):
     """
     class Meta:
         model = Message
-        fields = ('recipients', 'subject', 'body',)
+        fields = ('recipients', 'subject', 'body', 'language', )
 
     def __init__(self, sender, message, *args, **kw):
         self.parent_message = message

@@ -55,18 +55,25 @@ def do_print_inbox_count(parser, token):
         return InboxOutput()
 
 class MessageNode(Node):
-    def __init__(self, message):
+    def __init__(self, message, translated):
         self.message = Variable(message)
+        self.translated = translated
 
     def render(self, context):
         message = self.message.resolve(context)
-        message_str = message.body
+
+        if self.translated:
+            message_str = message.body_translated
+        else:
+            message_str = message.body
+
         try:
             plan = context["user"].get_profile().subscription
             if not plan or plan.membership_plan.free:
                 message_str = truncatewords_html(message_str, FREE_MEMBER_TRUNCATE_MESSAGE_WORDS)
         except (AttributeError, ObjectDoesNotExist):
             pass
+
         return linebreaksbr(message_str)
 
 @register.tag(name = 'render_message')
@@ -77,10 +84,16 @@ def do_render_message(parser, token):
 
     Usage::
         {% load inbox %}
-        {% render_message MESSAGE %}
+        {% render_message MESSAGE [translated] %}
+
+    If you add translated to the end of the tag call, the translated version of
+    the message will be rendered instead.
 
     """
     bits = token.contents.split()
-    if len(bits) != 2:
+    if len(bits) < 2 or len(bits) > 3 :
         raise TemplateSyntaxError("{% render_message %} requires a single argument, the message object to render.");
-    return MessageNode(bits[1])
+    translated = False
+    if len(bits) > 2 and bits[2] == "translated":
+        translated = True
+    return MessageNode(bits[1], translated)

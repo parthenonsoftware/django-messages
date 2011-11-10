@@ -20,7 +20,20 @@
         <dd>{{ message.recipient }}</dd>
     </dl>
 
-    {% render_message message %}
+    {% if message.language_translated %}
+        <div class="message" id="message_translation">
+            <p class="translation_notification">Automatically Translated from {{ message.language }} to {{ message.language_translated }}</p>
+            {% render_message message translated %}
+        </div>
+        <div class="message" id="message">
+            <p class="translation_notification original">Original Message (in {{ message.language }})</p>
+            {% render_message message %}
+        </div>
+    {% else %}
+        <div class="message" id="message">
+            {% render_message message %}
+        </div>
+    {% endif %}
 
     {% ifequal message.recipient.pk user.pk %}
     <a href="{% url messages_reply message.id %}">{% trans "Reply" %}</a>

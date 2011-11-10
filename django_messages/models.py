@@ -7,6 +7,7 @@ from django.db.models import signals
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 
+from mstranslator.models import Language
 
 class MessageQueryset(QuerySet):
     def unread(self):
@@ -77,7 +78,16 @@ class Message(models.Model):
     owner = models.ForeignKey(User, related_name='messages')
     to = models.CharField(max_length=255) # recipient usernames comma separated
     subject = models.CharField(_("Subject"), max_length=120)
+    language = models.ForeignKey(Language, related_name='+',
+                null = True, default = None, blank = True,
+            )
     body = models.TextField(_("Body"))
+    language_translated = models.ForeignKey(Language, related_name='+',
+                null = True, default = None, blank = True
+            )
+    body_translated = models.TextField(_("Translated Body"), 
+                null = True, default = None, blank = True,
+            )
     sender = models.ForeignKey(User, related_name='+', verbose_name=_("Sender"))
     recipient = models.ForeignKey(User, related_name='+', null=True, blank=True, verbose_name=_("Recipient"))
     thread = models.CharField(max_length=64, null=True, blank=True, db_index=True)

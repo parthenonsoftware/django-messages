@@ -48,10 +48,11 @@ class MessageAdmin(admin.ModelAdmin):
             ),
             'classes': ('monospace' ),
         }),
-        (_('Date/time'), {
+        (_('Details'), {
             'fields': (
                 'sent_at', 'read_at', 'replied_at',
-                'deleted_at',
+                'deleted_at', 'language', 
+                'language_translated', 'body_translated',
             ),
             'classes': ('collapse', 'wide'),
         }),
