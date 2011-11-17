@@ -24,6 +24,11 @@ def inbox(request, template_name='django_messages/inbox.html', **kw):
     """
     Displays a list of received messages for the current user.
 
+    ** Context **
+
+    ``objects``
+        List of :model:`django_messages.Message` objects.
+
     ** Templates ** 
 
     :template:`django_messages/inbox.html`
@@ -38,6 +43,11 @@ def outbox(request, template_name='django_messages/outbox.html', **kw):
     """
     Displays a list of sent messages for the current user.
 
+    ** Context **
+
+    ``objects``
+        List of :model:`django_messages.Message` objects.
+
     ** Templates ** 
 
     :template:`django_messages/outbox.html`
@@ -51,6 +61,11 @@ def outbox(request, template_name='django_messages/outbox.html', **kw):
 def trash(request, template_name='django_messages/trash.html', **kw):
     """
     Displays a list of deleted messages.
+
+    ** Context **
+
+    ``objects``
+        List of :model:`django_messages.Message` objects.
 
     ** Templates ** 
 
@@ -68,23 +83,37 @@ def compose(request, recipient=None, form_class=ComposeForm,
         recipient_filter=None, extra_context=None):
     """
     Displays and handles the ``form_class`` form to compose new messages.
+
     Required Arguments: None
+        
     Optional Arguments:
-        ``recipient``: username of a `django.contrib.auth` User, who should
-                       receive the message, optionally multiple usernames
-                       could be separated by a '+'
-        ``form_class``: the form-class to use
-        ``template_name``: the template to use
-        ``success_url``: where to redirect after successfull submission
-        ``extra_context``: extra context dict
+
+    ``recipient``: 
+        username of a :model:`django.contrib.auth` User, who should
+        receive the message, optionally multiple usernames
+        could be separated by a '+'
+
+    ``form_class``:
+        the form-class to use
+
+    ``template_name``: 
+        the template to use
+
+    ``success_url``: 
+        where to redirect after successfull submission
+
+    ``extra_context``: 
+        extra context dict
 
     ** Context **
-        ``form``
-            I think this is the form you put the message in or something.
+
+    ``form``
+        The message composition form; an instance of ``django_messages.Forms.ComposeForm``.
 
     ** Templates ** 
 
-    :template:`django_messages/trash.html`
+    :template:`django_messages/compose.html`
+
     """
     if request.method == "POST":
         form = form_class(request.user, data=request.POST,
@@ -113,6 +142,15 @@ def reply(request, message_id, form_class=ReplyForm,
     """
     Prepares the ``form_class`` form for writing a reply to a given message
     (specified via ``message_id``). 
+
+    ** Context **
+
+    ``form``
+        The message reply composition form, an instance of ``django_messages.Forms.ReplyForm``.
+
+    ** Templates **
+
+    :template:`django_messages/reply.html`
     """
     parent = get_object_or_404(Message, pk=message_id, owner=request.user)
 
@@ -187,12 +225,14 @@ def view(request, message_id, template_name='django_messages/view.html',
     ``read_at`` is set to the current datetime.
 
     ** Context **
-        ``message``
-            The message to display.
+
+    ``message``
+        The message to display.  An instance of :model:`django_messages.Message`.
 
     ** Templates ** 
 
     :template:`django_messages/view.html`
+
     """
     message = get_object_or_404(Message, pk=message_id, owner=request.user)
     if message.is_unread():
