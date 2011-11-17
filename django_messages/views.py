@@ -23,6 +23,8 @@ def message_list(request, queryset, paginate_by=25,
 def inbox(request, template_name='django_messages/inbox.html', **kw):
     """
     Displays a list of received messages for the current user.
+
+    :template:`django_messages/inbox.html`
     """
     kw['template_name'] = template_name
     queryset = Message.inbox.for_user(request.user)
