@@ -24,6 +24,8 @@ def inbox(request, template_name='django_messages/inbox.html', **kw):
     """
     Displays a list of received messages for the current user.
 
+    ** Templates ** 
+
     :template:`django_messages/inbox.html`
     """
     kw['template_name'] = template_name
@@ -35,6 +37,10 @@ def inbox(request, template_name='django_messages/inbox.html', **kw):
 def outbox(request, template_name='django_messages/outbox.html', **kw):
     """
     Displays a list of sent messages for the current user.
+
+    ** Templates ** 
+
+    :template:`django_messages/outbox.html`
     """
     kw['template_name'] = template_name
     queryset = Message.outbox.for_user(request.user)
@@ -45,6 +51,10 @@ def outbox(request, template_name='django_messages/outbox.html', **kw):
 def trash(request, template_name='django_messages/trash.html', **kw):
     """
     Displays a list of deleted messages.
+
+    ** Templates ** 
+
+    :template:`django_messages/trash.html`
     """
     kw['template_name'] = template_name
     queryset = Message.trash.for_user(request.user)
@@ -67,6 +77,14 @@ def compose(request, recipient=None, form_class=ComposeForm,
         ``template_name``: the template to use
         ``success_url``: where to redirect after successfull submission
         ``extra_context``: extra context dict
+
+    ** Context **
+        ``form``
+            I think this is the form you put the message in or something.
+
+    ** Templates ** 
+
+    :template:`django_messages/trash.html`
     """
     if request.method == "POST":
         form = form_class(request.user, data=request.POST,
@@ -167,6 +185,14 @@ def view(request, message_id, template_name='django_messages/view.html',
     is raised.
     If the user is the recipient and the message is unread
     ``read_at`` is set to the current datetime.
+
+    ** Context **
+        ``message``
+            The message to display.
+
+    ** Templates ** 
+
+    :template:`django_messages/view.html`
     """
     message = get_object_or_404(Message, pk=message_id, owner=request.user)
     if message.is_unread():
