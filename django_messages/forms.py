@@ -97,6 +97,30 @@ class MessageForm(forms.ModelForm):
          
         return instance, message_list
 
+    @property
+    def standard_layout(self):
+        """
+        A reasonable generic layout for messages; if uni_form is not installed,
+        this will fail silently and return ``None``.
+        """
+        try:
+            from uni_form.helper import FormHelper
+            from uni_form.layout import Layout, ButtonHolder, Submit
+            helper = FormHelper()
+            helper.form_method = "POST"
+            helper.layout = Layout(
+                        'recipients',
+                        'subject',
+                        'language',
+                        'body',
+                        ButtonHolder(
+                                Submit('send', 'Send')
+                            )
+                    )
+            return helper
+        except ImportError:
+            return None
+
 
 class ComposeForm(MessageForm):
     """
