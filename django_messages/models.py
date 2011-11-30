@@ -158,9 +158,9 @@ class Message(models.Model):
         try:
             from activity_messages.models import ActivityMessage
             ActivityMessage.quick_create(
-                actor = self.creator.user,
+                actor = self.sender,
                 action = 'email-received',
-                user = self.profile.user,
+                user = self.recipient,
                 content_object = self
             )
         except ImportError:
