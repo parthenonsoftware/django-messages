@@ -153,19 +153,21 @@ class Message(models.Model):
         except ImportError:
             pass
 
-        r = super(Message, self).save(*args, **kwargs)
-        
+        do_send_message = False
         try:
             from activity_messages.models import ActivityMessage
+            do_send_message = True
+        except ImportError:
+            do_send_message = False
+
+        r = super(Message, self).save(*args, **kwargs)
+        if do_send_message:
             ActivityMessage.quick_create(
                 actor = self.sender,
                 action = 'email-received',
                 user = self.recipient,
                 content_object = self
             )
-        except ImportError:
-            pass
-
         return r
     
     def __unicode__(self):
